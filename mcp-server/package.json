@@ -1,0 +1,21 @@
+{
+  "name": "aiventures-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for AiVentures Tasks API",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "aiventures-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}
