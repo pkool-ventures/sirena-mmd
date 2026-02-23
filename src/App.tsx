@@ -1,50 +1,128 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { useState, useCallback } from "react";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
+import sirenaLogo from "/src-tauri/icons/icon.svg";
+import MermaidEditor from "./components/MermaidEditor";
+import MermaidPreview from "./components/MermaidPreview";
+import Stack from "@mui/material/Stack";
+
+const DEFAULT_CODE = `graph TD
+    A[Start] --> B{Entscheidung}
+    B -->|Ja| C[Aktion 1]
+    B -->|Nein| D[Aktion 2]
+    C --> E[Ende]
+    D --> E`;
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [code, setCode] = useState(DEFAULT_CODE);
+  const [renderCode, setRenderCode] = useState(DEFAULT_CODE);
+  const [renderKey, setRenderKey] = useState(0);
+  const [showEditor, setShowEditor] = useState(true);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  const handleRun = useCallback(() => {
+    setRenderCode(code);
+    setRenderKey((k) => k + 1);
+  }, [code]);
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        bgcolor: "background.paper",
+      }}
+    >
+      <AppBar position="static" elevation={0}>
+        <Toolbar>
+          <Box>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <Box
+                component="img"
+                src={sirenaLogo}
+                alt="Sirena"
+                sx={{ height: 18 }}
+              />
+              <Box>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#cdd6f4",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    fontSize: "14px",
+                    mt: "2px",
+                  }}
+                >
+                  Sirena
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+          <Box
+            sx={{
+              ml: "auto",
+              mr: 1,
+              gap: 1,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Button variant="outlined" onClick={() => setShowEditor((v) => !v)}>
+              {showEditor ? "Editor ausblenden" : "Editor einblenden"}
+            </Button>
+            <Button variant="run" onClick={handleRun}>
+              <PlayArrowRoundedIcon sx={{ fontSize: 18 }} />
+              Run
+              <Box
+                component="span"
+                sx={{
+                  fontSize: "11px",
+                  fontWeight: 500,
+                  bgcolor: "rgba(255,255,255,0.15)",
+                  px: "8px",
+                  py: "2px",
+                  borderRadius: "4px",
+                }}
+              >
+                Ctrl+Enter
+              </Box>
+            </Button>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        <Box
+          sx={{
+            width: "50%",
+            minWidth: 0,
+            pt: 1,
+            borderRight: 1,
+            borderColor: "divider",
+            overflow: "hidden",
+            display: showEditor ? "flex" : "none",
+            flexDirection: "column",
+          }}
+        >
+          <MermaidEditor value={code} onChange={setCode} onRun={handleRun} />
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            overflow: "auto",
+            bgcolor: "background.paper",
+          }}
+        >
+          <MermaidPreview code={renderCode} renderKey={renderKey} />
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
