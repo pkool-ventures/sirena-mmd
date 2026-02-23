@@ -7,12 +7,8 @@ import {
 } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-import { markdown } from "@codemirror/lang-markdown";
-import {
-  syntaxHighlighting,
-  defaultHighlightStyle,
-  bracketMatching,
-} from "@codemirror/language";
+import { bracketMatching } from "@codemirror/language";
+import { mermaidLanguage, mermaidHighlightStyle } from "../lang-mermaid";
 
 interface MermaidEditorProps {
   value: string;
@@ -87,8 +83,8 @@ export default function MermaidEditor({
         highlightActiveLine(),
         history(),
         bracketMatching(),
-        syntaxHighlighting(defaultHighlightStyle),
-        markdown(),
+        mermaidLanguage,
+        mermaidHighlightStyle,
         darkTheme,
         runKeymap,
         keymap.of([...defaultKeymap, ...historyKeymap]),
